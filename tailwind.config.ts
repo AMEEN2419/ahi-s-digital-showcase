@@ -37,6 +37,7 @@ export default {
         "accordion-up": "accordion-up 0.2s ease-out",
         "glow-pulse": "glow-pulse 3s ease-in-out infinite",
         "spin-slow": "spin-slow 18s linear infinite",
+        "spin-rev": "spin-slow 24s linear infinite reverse",
         "float": "float 4s ease-in-out infinite",
         "fade-up": "fade-up 0.6s cubic-bezier(0.22,1,0.36,1) both",
         "marquee": "marquee 30s linear infinite",
