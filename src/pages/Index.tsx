@@ -8,10 +8,12 @@ import Experience from "@/components/portfolio/Experience";
 import Contact from "@/components/portfolio/Contact";
 import Footer from "@/components/portfolio/Footer";
 import AhiChat from "@/components/portfolio/AhiChat";
+import Constellation from "@/components/portfolio/Constellation";
 
 const Index = () => {
   return (
-    <div className="min-h-screen bg-background text-foreground">
+    <div className="min-h-screen bg-background text-foreground relative">
+      <Constellation />
       <Navbar />
       <main>
         <Hero />
