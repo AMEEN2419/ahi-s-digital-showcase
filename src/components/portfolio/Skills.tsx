@@ -91,13 +91,6 @@ const Skills = () => (
               </span>
             </button>
           </div>
-              <Icon size={18} style={{ color }} />
-              <span className="font-display font-semibold">{s.label}</span>
-              <span className="text-[10px] tracking-[0.2em] text-muted-foreground">
-                {s.kind}
-              </span>
-            </div>
-          </div>
         );
       })}
     </div>
