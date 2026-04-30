@@ -1,6 +1,6 @@
 import heroPhoto from "@/assets/ameen-hero.jpg";
 import { ArrowDown, Download } from "lucide-react";
-import { SiHtml5, SiReact, SiJavascript, SiPython, SiCss3, SiFigma } from "react-icons/si";
+import { SiHtml5, SiReact, SiJavascript, SiPython, SiCss, SiFigma } from "react-icons/si";
 import { useEffect, useState } from "react";
 
 const ROLES = [
