@@ -54,6 +54,17 @@ const Constellation = () => {
     const draw = () => {
       ctx.clearRect(0, 0, w, h);
 
+      // cursor glow halo
+      if (mouse.x > -1000) {
+        const grad = ctx.createRadialGradient(mouse.x, mouse.y, 0, mouse.x, mouse.y, 180);
+        grad.addColorStop(0, "rgba(120,200,255,0.18)");
+        grad.addColorStop(1, "rgba(120,200,255,0)");
+        ctx.fillStyle = grad;
+        ctx.beginPath();
+        ctx.arc(mouse.x, mouse.y, 180, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
       // dots
       for (const p of pts) {
         p.x += p.vx;
