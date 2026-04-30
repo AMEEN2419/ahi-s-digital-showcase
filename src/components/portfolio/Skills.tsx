@@ -78,15 +78,18 @@ const Skills = () => (
               animationDuration: `${4 + (i % 4)}s`,
             }}
           >
-            <div
-              className={`group ${sizeMap[s.size]} rounded-2xl border border-border bg-background/80 backdrop-blur flex items-center gap-3 hover:border-foreground transition-all cursor-default shadow-[0_0_30px_-10px_hsl(0_0%_100%/0.25)]`}
+            <button
+              onClick={() => document.querySelector("#contact")?.scrollIntoView({ behavior: "smooth" })}
+              onMouseEnter={(e) => { (e.currentTarget as HTMLButtonElement).dataset.hovered = "1"; }}
+              className={`group ${sizeMap[s.size]} rounded-2xl border border-border bg-background/80 backdrop-blur flex items-center gap-3 hover:border-foreground hover:scale-110 hover:-translate-y-1 transition-all cursor-pointer shadow-[0_0_30px_-10px_hsl(0_0%_100%/0.25)] hover:shadow-[0_0_40px_-5px_hsl(var(--accent-cyan)/0.6)]`}
+              title="Tap to contact Ameen"
             >
               <Icon size={18} style={{ color }} />
               <span className="font-display font-semibold">{s.label}</span>
               <span className="text-[10px] tracking-[0.2em] text-muted-foreground">
                 {s.kind}
               </span>
-            </div>
+            </button>
           </div>
         );
       })}
