@@ -155,7 +155,7 @@ const Hero = () => {
               { Icon: SiReact, color: "hsl(var(--accent-cyan))", pos: "top-4 left-2" },
               { Icon: SiJavascript, color: "hsl(var(--accent-yellow))", pos: "bottom-6 right-2" },
               { Icon: SiPython, color: "hsl(var(--accent-blue))", pos: "bottom-2 left-6" },
-              { Icon: SiCss3, color: "hsl(var(--accent-blue))", pos: "top-1/2 -right-2" },
+              { Icon: SiCss, color: "hsl(var(--accent-blue))", pos: "top-1/2 -right-2" },
               { Icon: SiFigma, color: "hsl(var(--accent-purple))", pos: "top-1/2 -left-2" },
             ].map(({ Icon, color, pos }, i) => (
               <div
