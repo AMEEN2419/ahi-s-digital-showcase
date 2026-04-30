@@ -1,8 +1,13 @@
 import { useEffect, useRef } from "react";
 
 /**
- * Animated dot+line constellation background (pure B&W).
- * Fixed full-viewport canvas behind all content.
+ * High-performance interactive network background.
+ * - Deep purple bg (#120222) provided by body
+ * - White glowing nodes
+ * - Translucent purple links (~0.5px) when nodes within 120px
+ * - Magnet effect: nodes within 150px of cursor are pulled toward it
+ * - Nodes near cursor get a magenta glow
+ * Targets 60fps via capped DPR, squared-distance checks, and a single RAF loop.
  */
 const Constellation = () => {
   const ref = useRef<HTMLCanvasElement>(null);
@@ -10,43 +15,65 @@ const Constellation = () => {
   useEffect(() => {
     const canvas = ref.current;
     if (!canvas) return;
-    const ctx = canvas.getContext("2d");
+    const ctx = canvas.getContext("2d", { alpha: true });
     if (!ctx) return;
 
     let raf = 0;
     let w = 0;
     let h = 0;
-    let dpr = Math.min(window.devicePixelRatio || 1, 2);
+    let dpr = Math.min(window.devicePixelRatio || 1, 1.5);
 
-    type P = { x: number; y: number; vx: number; vy: number; r: number };
+    type P = {
+      x: number;
+      y: number;
+      ox: number;
+      oy: number;
+      vx: number;
+      vy: number;
+      r: number;
+    };
     let pts: P[] = [];
 
+    const LINK_DIST = 120;
+    const LINK_DIST_SQ = LINK_DIST * LINK_DIST;
+    const MAGNET_DIST = 150;
+    const MAGNET_DIST_SQ = MAGNET_DIST * MAGNET_DIST;
+    const GLOW_DIST_SQ = 90 * 90;
+
     const resize = () => {
-      dpr = Math.min(window.devicePixelRatio || 1, 2);
+      dpr = Math.min(window.devicePixelRatio || 1, 1.5);
       w = window.innerWidth;
       h = window.innerHeight;
-      canvas.width = w * dpr;
-      canvas.height = h * dpr;
+      canvas.width = Math.floor(w * dpr);
+      canvas.height = Math.floor(h * dpr);
       canvas.style.width = w + "px";
       canvas.style.height = h + "px";
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 
-      const density = Math.min(140, Math.floor((w * h) / 14000));
-      pts = Array.from({ length: density }, () => ({
-        x: Math.random() * w,
-        y: Math.random() * h,
-        vx: (Math.random() - 0.5) * 0.25,
-        vy: (Math.random() - 0.5) * 0.25,
-        r: Math.random() * 1.4 + 0.4,
-      }));
+      const density = Math.min(120, Math.floor((w * h) / 16000));
+      pts = Array.from({ length: density }, () => {
+        const x = Math.random() * w;
+        const y = Math.random() * h;
+        return {
+          x,
+          y,
+          ox: x,
+          oy: y,
+          vx: (Math.random() - 0.5) * 0.2,
+          vy: (Math.random() - 0.5) * 0.2,
+          r: Math.random() * 1.2 + 0.6,
+        };
+      });
     };
 
-    const mouse = { x: -9999, y: -9999 };
+    const mouse = { x: -9999, y: -9999, active: false };
     const onMove = (e: MouseEvent) => {
       mouse.x = e.clientX;
       mouse.y = e.clientY;
+      mouse.active = true;
     };
     const onLeave = () => {
+      mouse.active = false;
       mouse.x = -9999;
       mouse.y = -9999;
     };
@@ -54,66 +81,95 @@ const Constellation = () => {
     const draw = () => {
       ctx.clearRect(0, 0, w, h);
 
-      // cursor glow halo
-      if (mouse.x > -1000) {
-        const grad = ctx.createRadialGradient(mouse.x, mouse.y, 0, mouse.x, mouse.y, 180);
-        grad.addColorStop(0, "rgba(120,200,255,0.18)");
-        grad.addColorStop(1, "rgba(120,200,255,0)");
+      // Subtle magenta cursor halo
+      if (mouse.active) {
+        const grad = ctx.createRadialGradient(
+          mouse.x, mouse.y, 0,
+          mouse.x, mouse.y, MAGNET_DIST
+        );
+        grad.addColorStop(0, "rgba(217, 70, 239, 0.18)");
+        grad.addColorStop(1, "rgba(217, 70, 239, 0)");
         ctx.fillStyle = grad;
         ctx.beginPath();
-        ctx.arc(mouse.x, mouse.y, 180, 0, Math.PI * 2);
+        ctx.arc(mouse.x, mouse.y, MAGNET_DIST, 0, Math.PI * 2);
         ctx.fill();
       }
 
-      // dots
-      for (const p of pts) {
+      // Update points (drift + magnet pull + spring back to origin)
+      for (let i = 0; i < pts.length; i++) {
+        const p = pts[i];
+
+        // Magnet pull
+        if (mouse.active) {
+          const dx = mouse.x - p.x;
+          const dy = mouse.y - p.y;
+          const d2 = dx * dx + dy * dy;
+          if (d2 < MAGNET_DIST_SQ && d2 > 0.5) {
+            const d = Math.sqrt(d2);
+            const force = (1 - d / MAGNET_DIST) * 0.6;
+            p.vx += (dx / d) * force;
+            p.vy += (dy / d) * force;
+          }
+        }
+
+        // Spring back toward origin (keeps network coherent)
+        p.vx += (p.ox - p.x) * 0.0025;
+        p.vy += (p.oy - p.y) * 0.0025;
+
+        // Damping
+        p.vx *= 0.92;
+        p.vy *= 0.92;
+
         p.x += p.vx;
         p.y += p.vy;
-        if (p.x < 0 || p.x > w) p.vx *= -1;
-        if (p.y < 0 || p.y > h) p.vy *= -1;
-
-        ctx.beginPath();
-        ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
-        ctx.fillStyle = "rgba(255,255,255,0.55)";
-        ctx.fill();
       }
 
-      // lines between near points
+      // Links — translucent purple, ultra-thin
+      ctx.lineWidth = 0.5;
       for (let i = 0; i < pts.length; i++) {
+        const a = pts[i];
         for (let j = i + 1; j < pts.length; j++) {
-          const a = pts[i];
           const b = pts[j];
           const dx = a.x - b.x;
           const dy = a.y - b.y;
           const d2 = dx * dx + dy * dy;
-          const max = 130;
-          if (d2 < max * max) {
-            const alpha = 1 - Math.sqrt(d2) / max;
-            ctx.strokeStyle = `rgba(255,255,255,${alpha * 0.18})`;
-            ctx.lineWidth = 0.6;
+          if (d2 < LINK_DIST_SQ) {
+            const alpha = (1 - Math.sqrt(d2) / LINK_DIST) * 0.35;
+            // translucent purple
+            ctx.strokeStyle = `rgba(168, 85, 247, ${alpha})`;
             ctx.beginPath();
             ctx.moveTo(a.x, a.y);
             ctx.lineTo(b.x, b.y);
             ctx.stroke();
           }
         }
-
-        // mouse interaction
-        const a = pts[i];
-        const dx = a.x - mouse.x;
-        const dy = a.y - mouse.y;
-        const d2 = dx * dx + dy * dy;
-        const max = 160;
-        if (d2 < max * max) {
-          const alpha = 1 - Math.sqrt(d2) / max;
-          ctx.strokeStyle = `rgba(255,255,255,${alpha * 0.5})`;
-          ctx.lineWidth = 0.8;
-          ctx.beginPath();
-          ctx.moveTo(a.x, a.y);
-          ctx.lineTo(mouse.x, mouse.y);
-          ctx.stroke();
-        }
       }
+
+      // Nodes — white glow, magenta near cursor
+      for (let i = 0; i < pts.length; i++) {
+        const p = pts[i];
+        let near = false;
+        if (mouse.active) {
+          const dx = p.x - mouse.x;
+          const dy = p.y - mouse.y;
+          near = dx * dx + dy * dy < GLOW_DIST_SQ;
+        }
+
+        if (near) {
+          ctx.shadowBlur = 12;
+          ctx.shadowColor = "rgba(217, 70, 239, 0.9)";
+          ctx.fillStyle = "rgba(255, 220, 255, 1)";
+        } else {
+          ctx.shadowBlur = 6;
+          ctx.shadowColor = "rgba(255, 255, 255, 0.6)";
+          ctx.fillStyle = "rgba(255, 255, 255, 0.9)";
+        }
+
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+        ctx.fill();
+      }
+      ctx.shadowBlur = 0;
 
       raf = requestAnimationFrame(draw);
     };
@@ -121,7 +177,7 @@ const Constellation = () => {
     resize();
     draw();
     window.addEventListener("resize", resize);
-    window.addEventListener("mousemove", onMove);
+    window.addEventListener("mousemove", onMove, { passive: true });
     window.addEventListener("mouseleave", onLeave);
 
     return () => {
@@ -136,7 +192,7 @@ const Constellation = () => {
     <canvas
       ref={ref}
       aria-hidden="true"
-      className="fixed inset-0 -z-10 pointer-events-none opacity-70"
+      className="fixed inset-0 -z-10 pointer-events-none"
     />
   );
 };

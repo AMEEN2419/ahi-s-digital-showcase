@@ -4,11 +4,11 @@
 
 @layer base {
   :root {
-    /* Pure B&W dark-dominant palette */
-    --background: 0 0% 4%;
+    /* Deep purple network palette */
+    --background: 280 80% 7%;
     --foreground: 0 0% 98%;
 
-    --card: 0 0% 7%;
+    --card: 280 50% 10%;
     --card-foreground: 0 0% 98%;
 
     --popover: 0 0% 6%;
@@ -52,9 +52,10 @@
   body {
     @apply bg-background text-foreground antialiased;
     font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    background-color: #120222;
     background-image:
-      radial-gradient(ellipse at top, hsl(0 0% 10%) 0%, transparent 50%),
-      radial-gradient(ellipse at bottom, hsl(0 0% 8%) 0%, transparent 60%);
+      radial-gradient(ellipse at top, hsl(280 70% 12%) 0%, transparent 50%),
+      radial-gradient(ellipse at bottom, hsl(290 60% 9%) 0%, transparent 60%);
     background-attachment: fixed;
   }
   ::selection { background: hsl(var(--foreground)); color: hsl(var(--background)); }
