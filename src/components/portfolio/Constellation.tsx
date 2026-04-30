@@ -34,13 +34,12 @@ const Constellation = () => {
     };
     let pts: P[] = [];
 
-    const LINK_DIST = 130;
+    const LINK_DIST = 140;
     const LINK_DIST_SQ = LINK_DIST * LINK_DIST;
-    const MAGNET_DIST = 220;
+    const MAGNET_DIST = 260;
     const MAGNET_DIST_SQ = MAGNET_DIST * MAGNET_DIST;
-    const GLOW_DIST_SQ = 110 * 110;
-    // Minimum distance nodes settle at around the cursor (creates tight cluster)
-    const CLUSTER_RADIUS = 14;
+    const GLOW_DIST_SQ = 130 * 130;
+    const CLUSTER_RADIUS = 18;
 
     const resize = () => {
       dpr = Math.min(window.devicePixelRatio || 1, 1.5);
@@ -52,7 +51,8 @@ const Constellation = () => {
       canvas.style.height = h + "px";
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 
-      const density = Math.min(120, Math.floor((w * h) / 16000));
+      // Higher density so the network is visible across the entire background
+      const density = Math.min(180, Math.floor((w * h) / 9000));
       pts = Array.from({ length: density }, () => {
         const x = Math.random() * w;
         const y = Math.random() * h;

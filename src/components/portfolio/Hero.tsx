@@ -54,20 +54,14 @@ const Hero = () => {
             Hi, I'm <span className="inline-block animate-float">👋</span>
           </p>
 
-          <h1 className="font-display font-bold leading-[0.95] text-5xl sm:text-6xl md:text-7xl text-gradient-mono">
-            {name.split(" ").map((word, wi) => (
-              <span key={wi} className="block overflow-hidden">
-                <span className="inline-block">
-                  {word.split("").map((ch, i) => (
-                    <span
-                      key={i}
-                      className="inline-block animate-fade-up"
-                      style={{ animationDelay: `${wi * 200 + i * 40}ms` }}
-                    >
-                      {ch}
-                    </span>
-                  ))}
-                </span>{" "}
+          <h1 className="font-display font-bold leading-[0.95] text-3xl sm:text-5xl md:text-6xl lg:text-7xl text-gradient-mono whitespace-nowrap">
+            {name.split("").map((ch, i) => (
+              <span
+                key={i}
+                className="inline-block animate-fade-up"
+                style={{ animationDelay: `${i * 50}ms` }}
+              >
+                {ch === " " ? "\u00A0" : ch}
               </span>
             ))}
           </h1>
