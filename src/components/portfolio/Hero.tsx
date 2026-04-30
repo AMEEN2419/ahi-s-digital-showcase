@@ -1,5 +1,6 @@
 import heroPhoto from "@/assets/ameen-hero.jpg";
-import { ArrowDown, Download, Code2, Palette, Brain, Cpu } from "lucide-react";
+import { ArrowDown, Download } from "lucide-react";
+import { SiHtml5, SiReact, SiJavascript, SiPython, SiCss, SiFigma } from "react-icons/si";
 import { useEffect, useState } from "react";
 
 const ROLES = [
@@ -122,14 +123,16 @@ const Hero = () => {
         {/* Glowing portrait + orbits */}
         <div className="order-1 md:order-2 flex justify-center md:justify-end">
           <div className="relative h-[22rem] w-[22rem] sm:h-[26rem] sm:w-[26rem] flex items-center justify-center">
-            {/* outer dashed rotating ring */}
-            <div className="absolute inset-0 rounded-full animate-spin-slow">
-              <div className="absolute inset-0 rounded-full border border-dashed border-foreground/25" />
-              {/* arc accents */}
-              <span className="absolute top-0 left-1/2 -translate-x-1/2 h-2 w-2 rounded-full bg-foreground" />
-              <span className="absolute bottom-0 left-1/2 -translate-x-1/2 h-1.5 w-1.5 rounded-full bg-foreground/70" />
-            </div>
-            {/* counter-rotating inner ring */}
+            {/* Colored arc rings (cyan/red) like reference */}
+            <svg
+              className="absolute inset-0 h-full w-full animate-spin-slow"
+              viewBox="0 0 100 100"
+              fill="none"
+              aria-hidden
+            >
+              <circle cx="50" cy="50" r="46" stroke="hsl(var(--accent-cyan))" strokeWidth="0.6" strokeDasharray="14 6" opacity="0.85" />
+              <circle cx="50" cy="50" r="42" stroke="hsl(var(--accent-red))" strokeWidth="0.5" strokeDasharray="8 10" opacity="0.7" />
+            </svg>
             <div className="absolute inset-6 rounded-full animate-spin-rev">
               <div className="absolute inset-0 rounded-full border border-foreground/10" />
             </div>
@@ -140,26 +143,27 @@ const Hero = () => {
                 <img
                   src={heroPhoto}
                   alt="Portrait of Ameen Islahi B, UI/UX designer and engineer"
-                  className="h-full w-full object-cover grayscale hover:grayscale-0 transition-all duration-700"
+                  className="h-full w-full object-cover"
                   loading="eager"
                 />
               </div>
             </div>
 
-            {/* Orbiting tech badges */}
+            {/* Orbiting tech badges (colored brand icons) */}
             {[
-              { Icon: Code2, label: "Code", pos: "top-2 right-4" },
-              { Icon: Palette, label: "Design", pos: "top-4 left-2" },
-              { Icon: Brain, label: "AI", pos: "bottom-6 right-2" },
-              { Icon: Cpu, label: "Systems", pos: "bottom-2 left-6" },
-            ].map(({ Icon, label, pos }, i) => (
+              { Icon: SiHtml5, color: "hsl(var(--accent-orange))", pos: "top-2 right-4" },
+              { Icon: SiReact, color: "hsl(var(--accent-cyan))", pos: "top-4 left-2" },
+              { Icon: SiJavascript, color: "hsl(var(--accent-yellow))", pos: "bottom-6 right-2" },
+              { Icon: SiPython, color: "hsl(var(--accent-blue))", pos: "bottom-2 left-6" },
+              { Icon: SiCss, color: "hsl(var(--accent-blue))", pos: "top-1/2 -right-2" },
+              { Icon: SiFigma, color: "hsl(var(--accent-purple))", pos: "top-1/2 -left-2" },
+            ].map(({ Icon, color, pos }, i) => (
               <div
-                key={label}
+                key={i}
                 className={`absolute ${pos} h-12 w-12 rounded-2xl border border-border bg-card/80 backdrop-blur flex items-center justify-center animate-float`}
-                style={{ animationDelay: `${i * 400}ms` }}
-                title={label}
+                style={{ animationDelay: `${i * 350}ms` }}
               >
-                <Icon size={18} />
+                <Icon size={22} style={{ color }} />
               </div>
             ))}
 
@@ -173,9 +177,10 @@ const Hero = () => {
         </div>
       </div>
 
+      {/* Scroll indicator — hidden on small screens to avoid overlapping CTAs */}
       <a
         href="#about"
-        className="absolute bottom-8 left-1/2 -translate-x-1/2 text-xs uppercase tracking-[0.3em] text-muted-foreground hover:text-foreground transition-colors flex flex-col items-center gap-2"
+        className="hidden lg:flex absolute bottom-6 right-8 text-[10px] uppercase tracking-[0.3em] text-muted-foreground hover:text-foreground transition-colors flex-col items-center gap-2"
       >
         Scroll
         <span className="h-10 w-px bg-foreground/30 animate-pulse" />
