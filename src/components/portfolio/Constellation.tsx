@@ -34,11 +34,13 @@ const Constellation = () => {
     };
     let pts: P[] = [];
 
-    const LINK_DIST = 120;
+    const LINK_DIST = 130;
     const LINK_DIST_SQ = LINK_DIST * LINK_DIST;
-    const MAGNET_DIST = 150;
+    const MAGNET_DIST = 220;
     const MAGNET_DIST_SQ = MAGNET_DIST * MAGNET_DIST;
-    const GLOW_DIST_SQ = 90 * 90;
+    const GLOW_DIST_SQ = 110 * 110;
+    // Minimum distance nodes settle at around the cursor (creates tight cluster)
+    const CLUSTER_RADIUS = 14;
 
     const resize = () => {
       dpr = Math.min(window.devicePixelRatio || 1, 1.5);
@@ -95,30 +97,38 @@ const Constellation = () => {
         ctx.fill();
       }
 
-      // Update points (drift + magnet pull + spring back to origin)
+      // Update points (drift + strong magnet pull + spring back to origin)
       for (let i = 0; i < pts.length; i++) {
         const p = pts[i];
 
-        // Magnet pull
+        // Strong magnet pull — clusters nodes tightly around cursor
         if (mouse.active) {
           const dx = mouse.x - p.x;
           const dy = mouse.y - p.y;
           const d2 = dx * dx + dy * dy;
-          if (d2 < MAGNET_DIST_SQ && d2 > 0.5) {
+          if (d2 < MAGNET_DIST_SQ && d2 > 0.0001) {
             const d = Math.sqrt(d2);
-            const force = (1 - d / MAGNET_DIST) * 0.6;
-            p.vx += (dx / d) * force;
-            p.vy += (dy / d) * force;
+            // Pull node toward a point CLUSTER_RADIUS away from cursor
+            // (so they don't all collapse onto one pixel)
+            const target = Math.max(d - CLUSTER_RADIUS, 0);
+            const t = target / d;
+            const tx = p.x + dx * t;
+            const ty = p.y + dy * t;
+            // Strength falls off with distance, but stays strong inside radius
+            const falloff = 1 - d / MAGNET_DIST;
+            const k = 0.18 * falloff;
+            p.vx += (tx - p.x) * k;
+            p.vy += (ty - p.y) * k;
           }
         }
 
-        // Spring back toward origin (keeps network coherent)
-        p.vx += (p.ox - p.x) * 0.0025;
-        p.vy += (p.oy - p.y) * 0.0025;
+        // Spring back toward origin so network reforms when cursor leaves
+        p.vx += (p.ox - p.x) * 0.012;
+        p.vy += (p.oy - p.y) * 0.012;
 
         // Damping
-        p.vx *= 0.92;
-        p.vy *= 0.92;
+        p.vx *= 0.86;
+        p.vy *= 0.86;
 
         p.x += p.vx;
         p.y += p.vy;
