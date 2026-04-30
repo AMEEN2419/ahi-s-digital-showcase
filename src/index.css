@@ -36,6 +36,15 @@
     --radius: 0.75rem;
 
     --glow: 0 0% 100%;
+
+    /* Color accents (inspired by reference) */
+    --accent-cyan: 174 80% 55%;
+    --accent-red: 0 84% 60%;
+    --accent-yellow: 48 96% 60%;
+    --accent-blue: 217 91% 60%;
+    --accent-purple: 270 80% 65%;
+    --accent-orange: 24 95% 58%;
+    --accent-green: 142 70% 50%;
   }
 
   * { @apply border-border; }
