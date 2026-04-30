@@ -1,5 +1,5 @@
 import Section from "./Section";
-import { Trophy, Briefcase, Languages, BookOpen } from "lucide-react";
+import { Trophy, Briefcase, BookOpen } from "lucide-react";
 
 const Experience = () => (
   <Section id="experience" eyebrow="Experience" title="Work, wins & words.">
@@ -52,33 +52,6 @@ const Experience = () => (
         </ul>
       </div>
 
-      <div className="rounded-2xl border border-border bg-card p-8 hover-scale">
-        <div className="flex items-center gap-3 mb-6">
-          <Languages size={18} />
-          <h3 className="font-display text-xl">Languages</h3>
-        </div>
-        <div className="space-y-3">
-          {[
-            { name: "English", level: 100 },
-            { name: "Malayalam", level: 100 },
-            { name: "Tamil", level: 100 },
-            { name: "Hindi", level: 60 },
-          ].map((l) => (
-            <div key={l.name}>
-              <div className="flex justify-between text-sm mb-1">
-                <span>{l.name}</span>
-                <span className="text-muted-foreground">{l.level === 100 ? "Fluent" : "Intermediate"}</span>
-              </div>
-              <div className="h-px bg-border overflow-hidden">
-                <div
-                  className="h-full bg-foreground transition-all duration-1000"
-                  style={{ width: `${l.level}%` }}
-                />
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
     </div>
   </Section>
 );
